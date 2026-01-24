@@ -42,7 +42,7 @@ func deleteCategoryById(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid Product ID", http.StatusBadRequest)
 		return
 	}
-	// loop produk cari ID, dapat index yang mau dihapus
+	// loop kategori cari ID, dapat index yang mau dihapus
 	for i, c := range categories {
 		if c.ID == id {
 			// bikin slice baru dengan data sebelum dan sesudah index
