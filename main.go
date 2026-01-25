@@ -32,10 +32,10 @@ var produk = []Produk{
 	{ID: 3, Nama: "Coca-cola", Harga: 5000, Stok: 100}, //meskipun data terakhir, harus tetap diakhiri tanda koma (,)
 }
 
-// DELETE localhost:8080/api/kategori/{id}
+// DELETE localhost:8080/categories/{id}
 func deleteCategoryById(w http.ResponseWriter, r *http.Request) {
 	// get id
-	idStr := strings.TrimPrefix(r.URL.Path, "/api/kategori/")
+	idStr := strings.TrimPrefix(r.URL.Path, "/categories/")
 	// ubah id ke int
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
@@ -82,10 +82,10 @@ func deleteProductById(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "Invalid Request", http.StatusNotFound)
 }
 
-// PUT localhost:8080/api/kategori/{id}
+// PUT localhost:8080/categories/{id}
 func updateCategoryById(w http.ResponseWriter, r *http.Request) {
 	// get id dari request
-	idStr := strings.TrimPrefix(r.URL.Path, "/api/kategori/")
+	idStr := strings.TrimPrefix(r.URL.Path, "/categories/")
 	// ganti id ke int
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
@@ -140,10 +140,10 @@ func updateProductById(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "Produk tidak ditemukan", http.StatusNotFound)
 }
 
-// GET localhost:8080/api/kategori/{id}
+// GET localhost:8080/categories/{id}
 func getCategoryById(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	idStr := strings.TrimPrefix(r.URL.Path, "/api/kategori/")
+	idStr := strings.TrimPrefix(r.URL.Path, "/categories/")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		http.Error(w, "Invalid category ID", http.StatusBadRequest) //404
@@ -177,10 +177,10 @@ func getProductById(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	//GET localhost:8080/api/kategori/{id} => API untuk menampilkan data kategori berdasarkan ID
-	//PUT localhost:8080/api/kategori/{id} => API untuk mengubah  data kategori berdasarkan ID
-	//DELETE localhost:8080/api/kategori/{id} => API untuk menghapus data kategori berdasarkan ID
-	http.HandleFunc("/api/kategori/", func(w http.ResponseWriter, r *http.Request) {
+	//GET localhost:8080/categories/{id} => API untuk menampilkan data kategori berdasarkan ID
+	//PUT localhost:8080/categories/{id} => API untuk mengubah  data kategori berdasarkan ID
+	//DELETE localhost:8080/categories/{id} => API untuk menghapus data kategori berdasarkan ID
+	http.HandleFunc("/categories/", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == "GET" {
 			getCategoryById(w, r)
 		} else if r.Method == "PUT" {
@@ -203,9 +203,9 @@ func main() {
 		}
 	})
 
-	//GET localhost:8080/api/kategori => API untuk menampilkan semua data kategori
-	//POST localhost:8080/api/kategori => API untuk membuat kategori baru
-	http.HandleFunc("/api/kategori", func(w http.ResponseWriter, r *http.Request) {
+	//GET localhost:8080/categories => API untuk menampilkan semua data kategori
+	//POST localhost:8080/categories => API untuk membuat kategori baru
+	http.HandleFunc("/categories", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		if r.Method == "GET" {
 			json.NewEncoder(w).Encode(categories)
@@ -241,8 +241,8 @@ func main() {
 		}
 	})
 
-	// localhost:8080/health => API untuk mengecek apakah server sedang berjalan
-	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+	// localhost:8080 => API untuk mengecek apakah server sedang berjalan
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]string{
 			"status":  "OK",
