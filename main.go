@@ -60,7 +60,7 @@ func main() {
 	http.HandleFunc("/api/categories", categoryHandler.HandleCategories)
 	http.HandleFunc("/api/categories/", categoryHandler.HandleCategoryByID)
 
-	http.HandleFunc("/api/checkout", transactionHandler.Checkout)
+	http.HandleFunc("/api/checkout", transactionHandler.HandleCheckout)
 	http.HandleFunc("/api/report/hari-ini", transactionHandler.HandleReport)
 
 	// localhost:8080/health
