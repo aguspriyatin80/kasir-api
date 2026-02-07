@@ -30,7 +30,9 @@ func (h *ProductHandler) HandleProducts(w http.ResponseWriter, r *http.Request) 
 
 // GetProducts - GET /api/products -> menampilkan semua data produk
 func (h *ProductHandler) GetProducts(w http.ResponseWriter, r *http.Request) {
-	products, err := h.service.GetProducts()
+	name := r.URL.Query().Get("name")
+	products, err := h.service.GetProducts(name)
+
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
