@@ -5,6 +5,7 @@ import (
 	"kasir-api/models"
 	"kasir-api/services"
 	"net/http"
+	"time"
 )
 
 type TransactionHandler struct {
@@ -13,6 +14,58 @@ type TransactionHandler struct {
 
 func NewTransactionHandler(service *services.TransactionService) *TransactionHandler {
 	return &TransactionHandler{service: service}
+}
+
+func (h *TransactionHandler) HandleTransactions(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodGet:
+		h.GetTransactions(w, r)
+	default:
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	}
+}
+
+func (h *TransactionHandler) HandleReport(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodGet:
+		h.GetReport(w, r)
+	default:
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	}
+}
+
+func (h *TransactionHandler) GetTransactions(w http.ResponseWriter, r *http.Request) {
+	transactions, err := h.service.GetTransactionToday()
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(transactions)
+}
+
+func (h *TransactionHandler) GetReport(w http.ResponseWriter, r *http.Request) {
+	startDate := r.URL.Query().Get("start_date")
+	endDate := r.URL.Query().Get("end_date")
+
+	_, err1 := time.Parse("2006-01-02", startDate)
+	_, err2 := time.Parse("2006-01-02", endDate)
+	if err1 != nil || err2 != nil {
+		http.Error(w, "format tanggal harus YYYY-MM-DD", http.StatusBadRequest)
+		return
+	}
+
+	transactions, err := h.service.GetReport(startDate, endDate)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(transactions)
 }
 
 func (h *TransactionHandler) HandleCheckout(w http.ResponseWriter, r *http.Request) {
@@ -39,14 +92,6 @@ func (h *TransactionHandler) Checkout(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(transaction)
-}
-
-func (h *TransactionHandler) HandleReport(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodGet {
-		h.SalesSummaryToday(w, r)
-	} else {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-	}
 }
 
 func (h *TransactionHandler) SalesSummaryToday(w http.ResponseWriter, r *http.Request) {

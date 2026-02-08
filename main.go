@@ -61,7 +61,9 @@ func main() {
 	http.HandleFunc("/api/categories/", categoryHandler.HandleCategoryByID)
 
 	http.HandleFunc("/api/checkout", transactionHandler.HandleCheckout)
-	http.HandleFunc("/api/report/hari-ini", transactionHandler.HandleReport)
+
+	http.HandleFunc("/api/report/hari-ini", transactionHandler.HandleTransactions)
+	http.HandleFunc("/api/report", transactionHandler.HandleReport)
 
 	// localhost:8080/health
 	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {

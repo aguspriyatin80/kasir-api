@@ -3,7 +3,9 @@ package repositories
 import (
 	"database/sql"
 	"fmt"
+	"kasir-api/dto"
 	"kasir-api/models"
+	"time"
 )
 
 type TransactionRepository struct {
@@ -134,4 +136,67 @@ func (repo *TransactionRepository) SalesSummaryToday() (models.RecapToday, error
 	}
 
 	return response, nil
+}
+
+func (repo *TransactionRepository) GetReport(startDate string, endDate string) (dto.ReportResponse, error) {
+
+	rows, err := repo.db.Query(`
+			SELECT id, total_amount, created_at::date
+			FROM transactions
+			WHERE created_at::date BETWEEN $1 AND $2
+			ORDER BY created_at ASC
+		`, startDate, endDate)
+	if err != nil {
+		// http.Error(w, err.Error(), http.StatusInternalServerError)
+		panic("There is something query error")
+	}
+	defer rows.Close()
+
+	var data []dto.TransactionReport
+	var totalRevenue int
+	var totalTransaksi int
+
+	for rows.Next() {
+		var tr dto.TransactionReport
+		var tanggal time.Time
+
+		rows.Scan(&tr.TransactionID, &tr.TotalAmount, &tanggal)
+		tr.Tanggal = tanggal.Format("2006-01-02")
+
+		totalRevenue += tr.TotalAmount
+		totalTransaksi++
+
+		data = append(data, tr)
+	}
+
+	response := dto.ReportResponse{
+		StartDate:      startDate,
+		EndDate:        endDate,
+		TotalTransaksi: totalTransaksi,
+		TotalRevenue:   totalRevenue,
+		Data:           data,
+	}
+	return response, nil
+
+}
+
+func (repo *TransactionRepository) GetTransactionToday() ([]models.Transaction, error) {
+	query := "SELECT id, total_amount, created_at FROM transactions WHERE DATE(created_at) = DATE(NOW())"
+	rows, err := repo.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	transactions := make([]models.Transaction, 0)
+	for rows.Next() {
+		var p models.Transaction
+		err := rows.Scan(&p.ID, &p.TotalAmount, &p.CreatedAt)
+		if err != nil {
+			return nil, err
+		}
+		transactions = append(transactions, p)
+	}
+
+	return transactions, nil
 }

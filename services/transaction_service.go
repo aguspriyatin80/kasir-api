@@ -1,6 +1,7 @@
 package services
 
 import (
+	"kasir-api/dto"
 	"kasir-api/models"
 	"kasir-api/repositories"
 )
@@ -19,4 +20,11 @@ func (s *TransactionService) Checkout(items []models.CheckoutItem) (*models.Tran
 
 func (s *TransactionService) SalesSummaryToday() (models.RecapToday, error) {
 	return s.repo.SalesSummaryToday()
+}
+
+func (s *TransactionService) GetTransactionToday() ([]models.Transaction, error) {
+	return s.repo.GetTransactionToday()
+}
+func (s *TransactionService) GetReport(startDate string, endDate string) (dto.ReportResponse, error) {
+	return s.repo.GetReport(startDate, endDate)
 }
